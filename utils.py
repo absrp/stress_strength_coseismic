@@ -260,19 +260,23 @@ def prepare_slip_data(slip_event,utm_crs):
 	slip_lat = slip_event['latitude_degrees']
 	slip_lon = slip_event['longitude_degrees']
 	slip_preferred = abs(slip_event['recommended_net_preferred_for_analysis_meters'])
+	rake_event = slip_event['fps_style']
 	indices = (slip_preferred > 0) & (slip_preferred < 20) # removing zeros and errors - val 999
 	slip_preferred = slip_preferred[indices]
 	slip_lat = slip_lat[indices]
 	slip_lon = slip_lon[indices]
+	rake = rake_event[indices]
 	slipx, slipy = extract_coordinates_stress(utm_crs, slip_lat, slip_lon)
-	return slipx, slipy, slip_preferred
+	return slipx, slipy, slip_preferred, rake
 
-def match_slip_to_segment(x_coords, y_coords, xslip_utm, yslip_utm, slip_preferred, num_closest=10):
+
+def match_slip_to_segment(x_coords, y_coords, xslip_utm, yslip_utm, slip_preferred, rake, num_closest=10):
 	"""
 	Find closest slip values (number of values considered given by variable num_closts) to each 
 	fault segment vertex, then selects the maximum from those values 
 	"""
 	max_slip_preferred = []
+	rake_slip = []
 	x_coords = x_coords[1:]
 	y_coords = y_coords[1:]
 	for x, y in zip(x_coords, y_coords):
@@ -282,8 +286,11 @@ def match_slip_to_segment(x_coords, y_coords, xslip_utm, yslip_utm, slip_preferr
 		closest_indices = np.argsort(distances)[:num_closest]   
 		# Pick the largest slip_preferred value within those indices
 		max_slip_preferredi = np.max(slip_preferred.iloc[closest_indices])
+		rake_preferredi = rake.iloc[closest_indices].mode()
 		max_slip_preferred.append(max_slip_preferredi)
-	return max_slip_preferred
+		rake_slip.append(rake_preferredi)
+	return max_slip_preferred, rake_slip
+
 
 def match_slip_to_epicenter(x_coords, y_coords, epix, epiy, slip):
 	"""
@@ -360,6 +367,7 @@ def calculate_normal_stress(radius,frac_angle,shear_stress):
 	frac_angle = np.deg2rad((frac_angle))
 	center_minus_sigma = shear_stress/np.tan(frac_angle) #radius * np.cos(frac_angle)
 	return center_minus_sigma
+
 
 # def plot_instability(normal):
 # 	minx = np.min(normal)
