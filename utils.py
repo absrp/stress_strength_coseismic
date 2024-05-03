@@ -7,6 +7,7 @@ import numpy as np
 from mpmath import sec
 from mpmath import *
 from itertools import chain
+from scipy import stats
 
 # from stack exchange
 class MidpointNormalize(colors.Normalize):
@@ -286,13 +287,14 @@ def match_slip_to_segment(x_coords, y_coords, xslip_utm, yslip_utm, slip_preferr
 		closest_indices = np.argsort(distances)[:num_closest]   
 		# Pick the largest slip_preferred value within those indices
 		max_slip_preferredi = np.max(slip_preferred.iloc[closest_indices])
-		rake_preferredi = rake.iloc[closest_indices].mode()
+		rake_preferredi = stats.mode(rake[closest_indices])
+		rake_preferredi = rake_preferredi[0]
 		max_slip_preferred.append(max_slip_preferredi)
 		rake_slip.append(rake_preferredi)
 	return max_slip_preferred, rake_slip
 
-def convert_rake_to_slip_vector(rake,strike):
-    slip_vector = rake + strike
+def convert_rake_to_slip_vector(rake,strike):    
+    slip_vector = np.array(strike)+np.array(rake)
     return slip_vector
 
 def measure_slip_vector_angle(slip_vector,shmax):
