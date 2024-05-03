@@ -291,6 +291,13 @@ def match_slip_to_segment(x_coords, y_coords, xslip_utm, yslip_utm, slip_preferr
 		rake_slip.append(rake_preferredi)
 	return max_slip_preferred, rake_slip
 
+def convert_rake_to_slip_vector(rake,strike):
+    slip_vector = rake + strike
+    return slip_vector
+
+def measure_slip_vector_angle(slip_vector,shmax):
+    slip_vector_angle = slip_vector - shmax
+    return slip_vector_angle
 
 def match_slip_to_epicenter(x_coords, y_coords, epix, epiy, slip):
 	"""
