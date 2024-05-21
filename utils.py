@@ -293,12 +293,18 @@ def match_slip_to_segment(x_coords, y_coords, xslip_utm, yslip_utm, slip_preferr
 		rake_slip.append(rake_preferredi)
 	return max_slip_preferred, rake_slip
 
-def convert_rake_to_slip_vector(rake,strike):    
+def convert_rake_to_slip_vector(rake,strike):
+    """
+    Convert rake to slip vector assuming vector is on fault plane
+    """    
     slip_vector = np.array(strike)+np.array(rake)
     return slip_vector
 
 def measure_slip_vector_angle(slip_vector,shmax):
     slip_vector_angle = slip_vector - shmax
+    slip_vector_angle = np.where(slip_vector_angle < -90, slip_vector_angle + 180, slip_vector_angle)
+    slip_vector_angle = np.where(slip_vector_angle > 90, slip_vector_angle - 180, slip_vector_angle)
+    
     return slip_vector_angle
 
 def match_slip_to_epicenter(x_coords, y_coords, epix, epiy, slip):
@@ -376,7 +382,6 @@ def calculate_normal_stress(radius,frac_angle,shear_stress):
 	frac_angle = np.deg2rad((frac_angle))
 	center_minus_sigma = shear_stress/np.tan(frac_angle) #radius * np.cos(frac_angle)
 	return center_minus_sigma
-
 
 # def plot_instability(normal):
 # 	minx = np.min(normal)
