@@ -301,10 +301,10 @@ def convert_rake_to_slip_vector(rake,strike):
     return slip_vector
 
 def measure_slip_vector_angle(slip_vector,shmax):
+    print(slip_vector)
+    print(shmax)
     slip_vector_angle = slip_vector - shmax
-    slip_vector_angle = np.where(slip_vector_angle < -90, slip_vector_angle + 180, slip_vector_angle)
-    slip_vector_angle = np.where(slip_vector_angle > 90, slip_vector_angle - 180, slip_vector_angle)
-    
+    print(slip_vector_angle)
     return slip_vector_angle
 
 def match_slip_to_epicenter(x_coords, y_coords, epix, epiy, slip):
